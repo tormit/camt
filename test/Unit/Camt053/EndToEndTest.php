@@ -159,28 +159,51 @@ class EndToEndTest extends AbstractTestCase
 
         foreach ($messages as $message) {
             $statements = $message->getRecords();
-
             self::assertCount(1, $statements);
+
             /** @var RecordWithBalances $statement */
             foreach ($statements as $statement) {
-                $balances = $statement->getBalances();
-                self::assertCount(2, $balances);
+                $actual = $this->extractBalances($statement);
+                $expected = [
+                    [
+                        'amount' => '1815',
+                        'code' => 'EUR',
+                        'type' => 'opening',
+                    ],
+                    [
+                        'amount' => '-2700',
+                        'code' => 'SEK',
+                        'type' => 'closing',
+                    ],
+                    [
+                        'amount' => '3500',
+                        'code' => 'CHF',
+                        'type' => 'opening_available',
+                    ],
+                    [
+                        'amount' => '-2700',
+                        'code' => 'JPY',
+                        'type' => 'closing_available',
+                    ],
+                ];
 
-                foreach ($balances as $item => $balance) {
-                    if ($item === 0) {
-                        self::assertEquals(1815, $balance->getAmount()->getAmount());
-                        self::assertEquals('EUR', $balance->getAmount()->getCurrency()->getCode());
-                        self::assertEquals('opening', $balance->getType());
-                    }
-
-                    if ($item === 1) {
-                        self::assertEquals(-2700, $balance->getAmount()->getAmount());
-                        self::assertEquals('SEK', $balance->getAmount()->getCurrency()->getCode());
-                        self::assertEquals('closing', $balance->getType());
-                    }
-                }
+                self::assertSame($expected, $actual);
             }
         }
+    }
+
+    private function extractBalances(RecordWithBalances $statement): array
+    {
+        $result = [];
+        foreach ($statement->getBalances() as $balance) {
+            $result[] = [
+                'amount' => $balance->getAmount()->getAmount(),
+                'code' => $balance->getAmount()->getCurrency()->getCode(),
+                'type' => $balance->getType(),
+            ];
+        }
+
+        return $result;
     }
 
     public function testEntries(): void

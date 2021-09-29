@@ -6,9 +6,7 @@ namespace Genkgo\Camt\Decoder;
 
 use Genkgo\Camt\DTO;
 use Genkgo\Camt\DTO\RecordWithBalances;
-use Genkgo\Camt\Util\StringToUnits;
-use Money\Currency;
-use Money\Money;
+use Genkgo\Camt\Util\MoneyFactory;
 use SimpleXMLElement;
 
 class Record
@@ -24,46 +22,64 @@ class Record
     private $dateDecoder;
 
     /**
+     * @var MoneyFactory
+     */
+    private $moneyFactory;
+
+    /**
      * Record constructor.
      */
     public function __construct(Entry $entryDecoder, DateDecoderInterface $dateDecoder)
     {
         $this->entryDecoder = $entryDecoder;
         $this->dateDecoder = $dateDecoder;
+        $this->moneyFactory = new MoneyFactory();
     }
 
     public function addBalances(RecordWithBalances $record, SimpleXMLElement $xmlRecord): void
     {
         $xmlBalances = $xmlRecord->Bal;
         foreach ($xmlBalances as $xmlBalance) {
-            $amount = StringToUnits::convert((string) $xmlBalance->Amt);
-            $currency = (string) $xmlBalance->Amt['Ccy'];
-            $date = (string) $xmlBalance->Dt->Dt;
+            $money = $this->moneyFactory->create($xmlBalance->Amt, $xmlBalance->CdtDbtInd);
+            $date = $this->dateDecoder->decode((string) $xmlBalance->Dt->Dt);
 
-            if ((string) $xmlBalance->CdtDbtInd === 'DBIT') {
-                $amount = $amount * -1;
+            if (!isset($xmlBalance->Tp, $xmlBalance->Tp->CdOrPrtry)) {
+                continue;
             }
+            $code = (string) $xmlBalance->Tp->CdOrPrtry->Cd;
 
-            if (isset($xmlBalance->Tp, $xmlBalance->Tp->CdOrPrtry)) {
-                $code = (string) $xmlBalance->Tp->CdOrPrtry->Cd;
-
-                if (in_array($code, ['OPBD', 'PRCD'], true)) {
+            switch ($code) {
+                case 'OPBD':
+                case 'PRCD':
                     $record->addBalance(DTO\Balance::opening(
-                        new Money(
-                            $amount,
-                            new Currency($currency)
-                        ),
-                        $this->dateDecoder->decode($date)
+                        $money,
+                        $date
                     ));
-                } elseif ($code === 'CLBD') {
+
+                    break;
+                case 'OPAV':
+                    $record->addBalance(DTO\Balance::openingAvailable(
+                        $money,
+                        $date
+                    ));
+
+                    break;
+                case 'CLBD':
                     $record->addBalance(DTO\Balance::closing(
-                        new Money(
-                            $amount,
-                            new Currency($currency)
-                        ),
-                        $this->dateDecoder->decode($date)
+                        $money,
+                        $date
                     ));
-                }
+
+                    break;
+                case 'CLAV':
+                    $record->addBalance(DTO\Balance::closingAvailable(
+                        $money,
+                        $date
+                    ));
+
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -73,20 +89,15 @@ class Record
         $index = 0;
         $xmlEntries = $xmlRecord->Ntry;
         foreach ($xmlEntries as $xmlEntry) {
-            $amount = StringToUnits::convert((string) $xmlEntry->Amt);
-            $currency = (string) $xmlEntry->Amt['Ccy'];
+            $money = $this->moneyFactory->create($xmlEntry->Amt, $xmlEntry->CdtDbtInd);
             $bookingDate = ((string) $xmlEntry->BookgDt->Dt) ?: (string) $xmlEntry->BookgDt->DtTm;
             $valueDate = ((string) $xmlEntry->ValDt->Dt) ?: (string) $xmlEntry->ValDt->DtTm;
             $additionalInfo = ((string) $xmlEntry->AddtlNtryInf) ?: (string) $xmlEntry->AddtlNtryInf;
 
-            if ((string) $xmlEntry->CdtDbtInd === 'DBIT') {
-                $amount = $amount * -1;
-            }
-
             $entry = new DTO\Entry(
                 $record,
                 $index,
-                new Money($amount, new Currency($currency))
+                $money
             );
 
             if ($bookingDate) {
@@ -117,6 +128,10 @@ class Record
 
             if (isset($xmlEntry->NtryDtls->TxDtls->Refs->PmtInfId) && (string) $xmlEntry->NtryDtls->TxDtls->Refs->PmtInfId) {
                 $entry->setBatchPaymentId((string) $xmlEntry->NtryDtls->TxDtls->Refs->PmtInfId);
+            }
+
+            if (isset($xmlEntry->Sts) && (string) $xmlEntry->Sts) {
+                $entry->setStatus((string) $xmlEntry->Sts);
             }
 
             if (isset($xmlEntry->BkTxCd)) {
@@ -155,10 +170,8 @@ class Record
                 $charges = new DTO\Charges();
 
                 if (isset($xmlEntry->Chrgs->TtlChrgsAndTaxAmt) && (string) $xmlEntry->Chrgs->TtlChrgsAndTaxAmt) {
-                    $amount = StringToUnits::convert((string) $xmlEntry->Chrgs->TtlChrgsAndTaxAmt);
-                    $currency = (string) $xmlEntry->Chrgs->TtlChrgsAndTaxAmt['Ccy'];
-
-                    $charges->setTotalChargesAndTaxAmount(new Money($amount, new Currency($currency)));
+                    $money = $this->moneyFactory->create($xmlEntry->Chrgs->TtlChrgsAndTaxAmt, null);
+                    $charges->setTotalChargesAndTaxAmount($money);
                 }
 
                 $chargesRecords = $xmlEntry->Chrgs->Rcrd;
@@ -169,14 +182,9 @@ class Record
                         $chargesDetail = new DTO\ChargesRecord();
 
                         if (isset($chargesRecord->Amt) && (string) $chargesRecord->Amt) {
-                            $amount = StringToUnits::convert((string) $chargesRecord->Amt);
-                            $currency = (string) $chargesRecord->Amt['Ccy'];
+                            $money = $this->moneyFactory->create($chargesRecord->Amt, $chargesRecord->CdtDbtInd);
 
-                            if ((string) $chargesRecord->CdtDbtInd === 'DBIT') {
-                                $amount = $amount * -1;
-                            }
-
-                            $chargesDetail->setAmount(new Money($amount, new Currency($currency)));
+                            $chargesDetail->setAmount($money);
                         }
                         if (isset($chargesRecord->CdtDbtInd) && (string) $chargesRecord->CdtDbtInd === 'true') {
                             $chargesDetail->setChargesIncludedIndicator(true);
