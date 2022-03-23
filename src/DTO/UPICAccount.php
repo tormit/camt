@@ -6,10 +6,7 @@ namespace Genkgo\Camt\DTO;
 
 class UPICAccount extends Account
 {
-    /**
-     * @var string
-     */
-    private $upic;
+    private string $upic;
 
     public function __construct(string $upic)
     {
@@ -22,7 +19,7 @@ class UPICAccount extends Account
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getIdentification(): string
     {

@@ -8,6 +8,7 @@ use Genkgo\Camt\Camt054\DTO as Camt054DTO;
 use Genkgo\Camt\Decoder\Message as BaseMessageDecoder;
 use Genkgo\Camt\DTO;
 use Genkgo\Camt\DTO\Account;
+use Genkgo\Camt\Exception\InvalidMessageException;
 use Genkgo\Camt\Iban;
 use SimpleXMLElement;
 
@@ -46,14 +47,14 @@ class Message extends BaseMessageDecoder
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getRootElement(SimpleXMLElement $document): SimpleXMLElement
     {
         return $document->BkToCstmrDbtCdtNtfctn;
     }
 
-    protected function getAccount(SimpleXMLElement $xmlRecord): ?Account
+    protected function getAccount(SimpleXMLElement $xmlRecord): Account
     {
         $account = null;
         if (isset($xmlRecord->Acct->Id->IBAN)) {
@@ -97,6 +98,6 @@ class Message extends BaseMessageDecoder
             return $account;
         }
 
-        return null;
+        throw new InvalidMessageException('Cannot decode account');
     }
 }

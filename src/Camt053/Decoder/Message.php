@@ -48,7 +48,7 @@ class Message extends BaseMessageDecoder
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getRootElement(SimpleXMLElement $document): SimpleXMLElement
     {

@@ -6,40 +6,19 @@ namespace Genkgo\Camt\DTO;
 
 class Recipient implements RelatedPartyTypeInterface
 {
-    /**
-     * @var null|string
-     */
-    private $id;
+    private ?string $id;
 
-    /**
-     * @var null|Address
-     */
-    private $address;
+    private ?Address $address = null;
 
-    /**
-     * @var null|string
-     */
-    private $name;
+    private ?string $name = null;
 
-    /**
-     * @var null|string
-     */
-    private $countryOfResidence;
+    private ?string $countryOfResidence = null;
 
-    /**
-     * @var null|ContactDetails
-     */
-    private $contactDetails;
+    private ?ContactDetails $contactDetails = null;
 
-    /**
-     * @var null|Identification
-     */
-    private $identification;
+    private ?Identification $identification = null;
 
-    /**
-     * @var null|string
-     */
-    private $typeName;
+    private ?string $typeName;
 
     public function getAddress(): ?Address
     {

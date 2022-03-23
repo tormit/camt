@@ -8,10 +8,7 @@ use Genkgo\Camt\Iban;
 
 class IbanAccount extends Account
 {
-    /**
-     * @var Iban
-     */
-    private $iban;
+    private Iban $iban;
 
     public function __construct(Iban $iban)
     {
@@ -24,7 +21,7 @@ class IbanAccount extends Account
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getIdentification(): string
     {

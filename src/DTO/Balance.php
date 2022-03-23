@@ -9,28 +9,19 @@ use Money\Money;
 
 class Balance
 {
-    const TYPE_OPENING = 'opening';
+    public const TYPE_OPENING = 'opening';
 
-    const TYPE_OPENING_AVAILABLE = 'opening_available';
+    public const TYPE_OPENING_AVAILABLE = 'opening_available';
 
-    const TYPE_CLOSING = 'closing';
+    public const TYPE_CLOSING = 'closing';
 
-    const TYPE_CLOSING_AVAILABLE = 'closing_available';
+    public const TYPE_CLOSING_AVAILABLE = 'closing_available';
 
-    /**
-     * @var Money
-     */
-    private $amount;
+    private Money $amount;
 
-    /**
-     * @var string
-     */
-    private $type;
+    private string $type;
 
-    /**
-     * @var DateTimeImmutable
-     */
-    private $date;
+    private DateTimeImmutable $date;
 
     private function __construct(string $type, Money $amount, DateTimeImmutable $date)
     {

@@ -12,10 +12,7 @@ use SimpleXMLElement;
 
 final class MoneyFactory
 {
-    /**
-     * @var DecimalMoneyParser
-     */
-    private $decimalMoneyParser;
+    private DecimalMoneyParser $decimalMoneyParser;
 
     public function __construct()
     {
@@ -30,9 +27,12 @@ final class MoneyFactory
             $amount = (string) ((float) $amount * -1);
         }
 
+        /** @psalm-var non-empty-string $currency */
+        $currency = (string) $xmlAmount['Ccy'];
+
         return $this->decimalMoneyParser->parse(
             $amount,
-            new Currency((string) $xmlAmount['Ccy'])
+            new Currency($currency)
         );
     }
 }

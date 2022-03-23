@@ -11,22 +11,14 @@ use SimpleXMLElement;
 
 class Decoder implements DecoderInterface
 {
-    /**
-     * @var SimpleXMLElement
-     */
-    private $document;
+    private SimpleXMLElement $document;
+
+    private Decoder\Message $messageDecoder;
 
     /**
-     * @var Decoder\Message
+     * Path to the schema definition.
      */
-    private $messageDecoder;
-
-    /**
-     * Path to the schema definition
-     *
-     * @var string
-     */
-    protected $schemeDefinitionPath;
+    protected string $schemeDefinitionPath;
 
     public function __construct(Decoder\Message $messageDecoder, string $schemeDefinitionPath)
     {
@@ -60,7 +52,7 @@ class Decoder implements DecoderInterface
         }
 
         $document = simplexml_import_dom($document);
-        if ($document === false) {
+        if (!$document) {
             throw new InvalidMessageException('Provided XML could not be parsed');
         }
 

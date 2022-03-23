@@ -13,12 +13,9 @@ class Config
     /**
      * @var MessageFormatInterface[]
      */
-    private $messageFormats = [];
+    private array $messageFormats = [];
 
-    /**
-     * @var bool
-     */
-    private $xsdValidation = true;
+    private bool $xsdValidation = true;
 
     public function addMessageFormat(MessageFormatInterface $messageFormat): void
     {
@@ -47,6 +44,7 @@ class Config
     {
         $config = new self();
         $config->addMessageFormat(new Camt052\MessageFormat\V01());
+        $config->addMessageFormat(new Camt052\MessageFormat\V02());
         $config->addMessageFormat(new Camt052\MessageFormat\V04());
         $config->addMessageFormat(new Camt052\MessageFormat\V06());
         $config->addMessageFormat(new Camt053\MessageFormat\V02());
