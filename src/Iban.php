@@ -5,22 +5,23 @@ declare(strict_types=1);
 namespace Genkgo\Camt;
 
 use Iban\Validation\Iban as IbanDetails;
-use Iban\Validation\Validator;
 use InvalidArgumentException;
 
 class Iban
 {
     private string $iban;
+    public static $validateIban = true;
 
     public function __construct(string $iban)
     {
-        $iban = new IbanDetails($iban);
-
-        if (!(new Validator())->validate($iban)) {
-            throw new InvalidArgumentException("Unknown IBAN {$iban}");
+        if (static::$validateIban) {
+            if (!verify_iban($iban)) {
+                throw new InvalidArgumentException("Unknown IBAN {$iban}");
+            }
         }
 
-        $this->iban = $iban->getNormalizedIban();
+        $ibanNormalized = iban_to_human_format($iban);
+        $this->iban = $ibanNormalized;
     }
 
     public function getIban(): string
