@@ -10,9 +10,9 @@ use Genkgo\Camt\Config;
 use Genkgo\Camt\DTO;
 use Genkgo\Camt\Exception\ReaderException;
 use Genkgo\Camt\Reader;
-use Genkgo\TestCamt\AbstractTestCase;
+use PHPUnit\Framework;
 
-class ReaderTest extends AbstractTestCase
+class ReaderTest extends Framework\TestCase
 {
     protected function getDefaultConfig(): Config
     {
@@ -45,7 +45,7 @@ class ReaderTest extends AbstractTestCase
     public function testReadFile(): void
     {
         $reader = new Reader(Config::getDefault());
-        $message = $reader->readFile(__DIR__ . '/Camt053/Stubs/camt053.v2.minimal.xml');
+        $message = $reader->readFile('test/data/camt053.v2.minimal.xml');
         self::assertInstanceOf(DTO\Message::class, $message);
     }
 
@@ -55,7 +55,7 @@ class ReaderTest extends AbstractTestCase
         $config->disableXsdValidation();
 
         $reader = new Reader($config);
-        $message = $reader->readFile(__DIR__ . '/Camt053/Stubs/camt053.v2.minimal.xml');
+        $message = $reader->readFile('test/data/camt053.v2.minimal.xml');
         self::assertInstanceOf(DTO\Message::class, $message);
     }
 }

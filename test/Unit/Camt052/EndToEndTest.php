@@ -12,14 +12,14 @@ use Genkgo\Camt\DTO;
 use Genkgo\Camt\DTO\Entry;
 use Genkgo\Camt\DTO\Message;
 use Genkgo\Camt\DTO\OrganisationIdentification;
-use Genkgo\TestCamt\AbstractTestCase;
+use PHPUnit\Framework;
 
-class EndToEndTest extends AbstractTestCase
+class EndToEndTest extends Framework\TestCase
 {
     protected function getV1Message(): Message
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->load(__DIR__ . '/Stubs/camt052.v1.xml');
+        $dom->load('test/data/camt052.v1.xml');
 
         return (new MessageFormat\V01())->getDecoder()->decode($dom);
     }
@@ -27,7 +27,7 @@ class EndToEndTest extends AbstractTestCase
     protected function getV2Message(): Message
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->load(__DIR__ . '/Stubs/camt052.v2.xml');
+        $dom->load('test/data/camt052.v2.xml');
 
         return (new MessageFormat\V02())->getDecoder()->decode($dom);
     }
@@ -35,7 +35,7 @@ class EndToEndTest extends AbstractTestCase
     protected function getV2OtherAccountMessage(): Message
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->load(__DIR__ . '/Stubs/camt052.v2.other-account.xml');
+        $dom->load('test/data/camt052.v2.other-account.xml');
 
         return (new MessageFormat\V02())->getDecoder()->decode($dom);
     }
@@ -43,7 +43,7 @@ class EndToEndTest extends AbstractTestCase
     protected function getV4Message(): Message
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->load(__DIR__ . '/Stubs/camt052.v4.xml');
+        $dom->load('test/data/camt052.v4.xml');
 
         return (new MessageFormat\V04())->getDecoder()->decode($dom);
     }
@@ -51,9 +51,17 @@ class EndToEndTest extends AbstractTestCase
     protected function getV6Message(): Message
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->load(__DIR__ . '/Stubs/camt052.v6.xml');
+        $dom->load('test/data/camt052.v6.xml');
 
         return (new MessageFormat\V06())->getDecoder()->decode($dom);
+    }
+
+    protected function getV8Message(): Message
+    {
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom->load('test/data/camt052.v8.xml');
+
+        return (new MessageFormat\V08())->getDecoder()->decode($dom);
     }
 
     public function testGroupHeader(): void
@@ -63,6 +71,7 @@ class EndToEndTest extends AbstractTestCase
             $this->getV2Message(),
             $this->getV4Message(),
             $this->getV6Message(),
+            $this->getV8Message(),
         ];
 
         /** @var Message $message */
@@ -96,6 +105,7 @@ class EndToEndTest extends AbstractTestCase
             $this->getV1Message(),
             $this->getV2Message(),
             $this->getV4Message(),
+            $this->getV8Message(),
         ];
 
         foreach ($messages as $message) {
@@ -123,6 +133,7 @@ class EndToEndTest extends AbstractTestCase
             $this->getV1Message(),
             $this->getV2Message(),
             $this->getV4Message(),
+            $this->getV8Message(),
         ];
 
         foreach ($messages as $message) {
@@ -171,6 +182,7 @@ class EndToEndTest extends AbstractTestCase
         $messages = [
             $this->getV1Message(),
             $this->getV4Message(),
+            $this->getV8Message(),
         ];
 
         self::assertEquals('BOOK', $messages[0]->getRecords()[0]->getEntries()[0]->getStatus());

@@ -12,14 +12,14 @@ use Genkgo\Camt\Camt054\MessageFormat;
 use Genkgo\Camt\DTO;
 use Genkgo\Camt\DTO\Message;
 use Genkgo\Camt\DTO\OrganisationIdentification;
-use Genkgo\TestCamt\AbstractTestCase;
+use PHPUnit\Framework;
 
-class EndToEndTest extends AbstractTestCase
+class EndToEndTest extends Framework\TestCase
 {
     protected function getV2Message(): Message
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->load(__DIR__ . '/Stubs/camt054.v2.xml');
+        $dom->load('test/data/camt054.v2.xml');
 
         return (new MessageFormat\V02())->getDecoder()->decode($dom);
     }
@@ -27,9 +27,17 @@ class EndToEndTest extends AbstractTestCase
     protected function getV4Message(): Message
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->load(__DIR__ . '/Stubs/camt054.v4.xml');
+        $dom->load('test/data/camt054.v4.xml');
 
         return (new MessageFormat\V04())->getDecoder()->decode($dom);
+    }
+
+    protected function getv8Message(): Message
+    {
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom->load('test/data/camt054.v8.xml');
+
+        return (new MessageFormat\V08())->getDecoder()->decode($dom);
     }
 
     public function testGroupHeader(): void
@@ -37,6 +45,7 @@ class EndToEndTest extends AbstractTestCase
         $messages = [
             $this->getV2Message(),
             $this->getV4Message(),
+            $this->getV8Message(),
         ];
 
         /** @var Message $message */
@@ -86,6 +95,7 @@ class EndToEndTest extends AbstractTestCase
         $messages = [
             $this->getV2Message(),
             $this->getV4Message(),
+            $this->getV8Message(),
         ];
 
         foreach ($messages as $message) {
@@ -117,6 +127,7 @@ class EndToEndTest extends AbstractTestCase
         $messages = [
             $this->getV2Message(),
             $this->getV4Message(),
+            $this->getV8Message(),
         ];
 
         foreach ($messages as $message) {
@@ -145,6 +156,7 @@ class EndToEndTest extends AbstractTestCase
         $messages = [
             $this->getV2Message(),
             $this->getV4Message(),
+            $this->getV8Message(),
         ];
 
         foreach ($messages as $message) {

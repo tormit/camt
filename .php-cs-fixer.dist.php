@@ -88,7 +88,7 @@ return (new PhpCsFixer\Config())
         'mb_str_functions' => true,
         'method_argument_space' => true,
         'method_chaining_indentation' => true,
-        'modernize_strpos' => false, // Require PHP 8.0
+        'modernize_strpos' => true,
         'modernize_types_casting' => true,
         'multiline_comment_opening_closing' => true,
         'multiline_whitespace_before_semicolons' => true,
@@ -125,8 +125,7 @@ return (new PhpCsFixer\Config())
         'no_spaces_inside_parenthesis' => true,
         'no_superfluous_elseif' => true,
         'no_superfluous_phpdoc_tags' => ['allow_mixed' => true],
-        'no_trailing_comma_in_list_call' => true,
-        'no_trailing_comma_in_singleline_array' => true,
+        'no_trailing_comma_in_singleline' => true,
         'no_trailing_whitespace' => true,
         'no_trailing_whitespace_in_comment' => true,
         'no_trailing_whitespace_in_string' => false, // Too dangerous
@@ -148,13 +147,14 @@ return (new PhpCsFixer\Config())
         'not_operator_with_successor_space' => false, // idem
         'nullable_type_declaration_for_default_null_value' => true,
         'object_operator_without_whitespace' => true,
-        'octal_notation' => true,
+        'octal_notation' => false, // Require PHP 8.1
         'operator_linebreak' => true,
         'ordered_class_elements' => false, // We prefer to keep some freedom
         'ordered_imports' => true,
         'ordered_interfaces' => true,
         'ordered_traits' => true,
         'php_unit_construct' => true,
+        'php_unit_data_provider_static' => true,
         'php_unit_dedicate_assert' => true,
         'php_unit_dedicate_assert_internal_type' => true,
         'php_unit_expectation' => true,

@@ -13,14 +13,14 @@ use Genkgo\Camt\DTO\Message;
 use Genkgo\Camt\DTO\OrganisationIdentification;
 use Genkgo\Camt\DTO\RecordWithBalances;
 use Genkgo\Camt\Exception\InvalidMessageException;
-use Genkgo\TestCamt\AbstractTestCase;
+use PHPUnit\Framework;
 
-class EndToEndTest extends AbstractTestCase
+class EndToEndTest extends Framework\TestCase
 {
     protected function getV2Message(): Message
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->load(__DIR__ . '/Stubs/camt053.v2.minimal.xml');
+        $dom->load('test/data/camt053.v2.minimal.xml');
 
         return (new MessageFormat\V02())->getDecoder()->decode($dom);
     }
@@ -28,7 +28,7 @@ class EndToEndTest extends AbstractTestCase
     protected function getV2UltimateMessage(): Message
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->load(__DIR__ . '/Stubs/camt053.v2.minimal.ultimate.xml');
+        $dom->load('test/data/camt053.v2.minimal.ultimate.xml');
 
         return (new MessageFormat\V02())->getDecoder()->decode($dom);
     }
@@ -36,7 +36,7 @@ class EndToEndTest extends AbstractTestCase
     protected function getV3Message(): Message
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->load(__DIR__ . '/Stubs/camt053.v3.xml');
+        $dom->load('test/data/camt053.v3.xml');
 
         return (new MessageFormat\V03())->getDecoder()->decode($dom);
     }
@@ -44,9 +44,17 @@ class EndToEndTest extends AbstractTestCase
     protected function getV4Message(): Message
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->load(__DIR__ . '/Stubs/camt053.v4.xml');
+        $dom->load('test/data/camt053.v4.xml');
 
         return (new MessageFormat\V04())->getDecoder()->decode($dom);
+    }
+
+    protected function getV8Message(): Message
+    {
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom->load('test/data/camt053.v8.xml');
+
+        return (new MessageFormat\V08())->getDecoder()->decode($dom);
     }
 
     public function testWrongDocument(): Message
@@ -54,7 +62,7 @@ class EndToEndTest extends AbstractTestCase
         $this->expectException(InvalidMessageException::class);
 
         $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->load(__DIR__ . '/Stubs/camt053.v2.wrong.xml');
+        $dom->load('test/data/camt053.v2.wrong.xml');
 
         return (new MessageFormat\V02())->getDecoder()->decode($dom);
     }
@@ -62,22 +70,29 @@ class EndToEndTest extends AbstractTestCase
     public function testFiveDecimalsStatement(): void
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->load(__DIR__ . '/Stubs/camt053.v2.five.decimals.xml');
+        $dom->load('test/data/camt053.v2.five.decimals.xml');
         self::assertInstanceOf(Message::class, (new MessageFormat\V02())->getDecoder()->decode($dom));
     }
 
     public function testV3Document(): void
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->load(__DIR__ . '/Stubs/camt053.v3.xml');
+        $dom->load('test/data/camt053.v3.xml');
         self::assertInstanceOf(Message::class, (new MessageFormat\V03())->getDecoder()->decode($dom));
     }
 
     public function testV4Document(): void
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
-        $dom->load(__DIR__ . '/Stubs/camt053.v4.xml');
+        $dom->load('test/data/camt053.v4.xml');
         self::assertInstanceOf(Message::class, (new MessageFormat\V04())->getDecoder()->decode($dom));
+    }
+
+    public function testV8Document(): void
+    {
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom->load('test/data/camt053.v8.xml');
+        self::assertInstanceOf(Message::class, (new MessageFormat\V08())->getDecoder()->decode($dom));
     }
 
     public function testGroupHeader(): void
@@ -86,6 +101,7 @@ class EndToEndTest extends AbstractTestCase
             $this->getV2Message(),
             $this->getV3Message(),
             $this->getV4Message(),
+            $this->getV8Message(),
             $this->getV2UltimateMessage(),
         ];
 
@@ -120,6 +136,7 @@ class EndToEndTest extends AbstractTestCase
             $this->getV2Message(),
             $this->getV3Message(),
             $this->getV4Message(),
+            $this->getV8Message(),
             $this->getV2UltimateMessage(),
         ];
 
@@ -154,6 +171,7 @@ class EndToEndTest extends AbstractTestCase
             $this->getV2Message(),
             $this->getV3Message(),
             $this->getV4Message(),
+            $this->getV8Message(),
             $this->getV2UltimateMessage(),
         ];
 
@@ -212,6 +230,7 @@ class EndToEndTest extends AbstractTestCase
             $this->getV2Message(),
             $this->getV3Message(),
             $this->getV4Message(),
+            $this->getV8Message(),
             $this->getV2UltimateMessage(),
         ];
 
@@ -278,6 +297,7 @@ class EndToEndTest extends AbstractTestCase
             $this->getV2Message(),
             $this->getV3Message(),
             $this->getV4Message(),
+            $this->getV8Message(),
             $this->getV2UltimateMessage(),
         ];
 
